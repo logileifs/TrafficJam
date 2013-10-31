@@ -22,12 +22,14 @@ public class PlayView extends View {
 
     private class MyShape {
 
-        MyShape( Rect r, int c ) {
+        MyShape( Rect r, int c, boolean v ) {
             rect = r;
             color = c;
+            isVertical = v;
         }
         Rect rect;
         int  color;
+        boolean isVertical;
     }
 
     Paint mPaint = new Paint();
@@ -37,8 +39,8 @@ public class PlayView extends View {
     public PlayView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        mShapes.add(new MyShape(new Rect(0, 0, 100, 100), Color.RED));
-        mShapes.add(new MyShape( new Rect( 200, 300, 300, 350), Color.BLUE ) );
+        mShapes.add(new MyShape(new Rect(0, 0, 100, 100), Color.RED, true));
+        mShapes.add(new MyShape( new Rect( 200, 300, 300, 350), Color.BLUE , false) );
     }
 
     protected void onDraw( Canvas canvas ) {
@@ -64,10 +66,20 @@ public class PlayView extends View {
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
+
                 if ( mMovingShape != null ) {
-                    x = Math.min( x, getWidth() - mMovingShape.rect.width() );
-                    mMovingShape.rect.offsetTo( x, y );
-                    invalidate();
+                    if(mMovingShape.isVertical){
+                        x = Math.min( x, getWidth() - mMovingShape.rect.width() );
+                        y = mMovingShape.rect.top;
+                        mMovingShape.rect.offsetTo( x, y );
+                        invalidate();
+                    }else{
+                        x = mMovingShape.rect.left;
+                        mMovingShape.rect.offsetTo( x, y );
+                        invalidate();
+                    }
+
+
                 }
                 break;
         }
