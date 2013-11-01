@@ -1,6 +1,7 @@
 package com.example.TrafficJam;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.os.Bundle;
@@ -34,12 +35,8 @@ public class PuzzlesActivity extends Activity {
 		// Get ListView object from xml
 		listView = (ListView) findViewById(R.id.list);
 
-	    //TextView myXmlContent = (TextView)findViewById(R.id.challenge_classic40);
-	    //String stringXmlContent;
 	    try {
-		    getEventsFromAnXML(this);
-		    //stringXmlContent = getEventsFromAnXML(this);
-		    //myXmlContent.setText(stringXmlContent);
+		    parseXML(this);
 	    } catch (XmlPullParserException e) {
 		    // TODO Auto-generated catch block
 		    e.printStackTrace();
@@ -54,7 +51,6 @@ public class PuzzlesActivity extends Activity {
 		// Defined Array values to show in ListView
 		for(Puzzle puzzle : puzzles)
 		{
-			System.out.println(puzzle.setup);
 			values[index] = puzzle.description;
 			index++;
 		}
@@ -73,27 +69,26 @@ public class PuzzlesActivity extends Activity {
 	    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    @Override
 		    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			    // ListView Clicked item index
-			    int itemPosition     = position;
 
 			    // ListView Clicked item value
-			    String  itemValue    = (String) listView.getItemAtPosition(position);
+			    String setup = puzzles.get(position).setup;
 
-			    // Show Alert
-			    Toast.makeText(getApplicationContext(), "Position :"+itemPosition+"  ListItem : " +itemValue , Toast.LENGTH_LONG).show();
+			    Intent intent = new Intent(PuzzlesActivity.this, PlayActivity.class);
+			    Bundle bundle = new Bundle();
+			    bundle.putString("setup", setup);
+			    intent.putExtras(bundle);
+			    startActivity(intent);
 		    }
 		});
     }
 
-	//private String getEventsFromAnXML(Activity activity) throws XmlPullParserException, IOException
-	private void getEventsFromAnXML(Activity activity) throws XmlPullParserException, IOException
+	private void parseXML(Activity activity) throws XmlPullParserException, IOException
 	{
 		int number = 0;
 		int level = 0;
 		String setup = null;
 		boolean blevel = false;
 		boolean bsetup = false;
-		StringBuffer stringBuffer = new StringBuffer();
 		Resources res = activity.getResources();
 		XmlResourceParser xpp = res.getXml(R.xml.challenge_classic40);
 		xpp.next();
