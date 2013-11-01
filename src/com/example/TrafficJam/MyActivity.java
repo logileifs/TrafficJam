@@ -26,7 +26,11 @@ public class MyActivity extends Activity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MyActivity.this, PlayActivity.class);
-                startActivity(intent);
+	            Bundle bundle = new Bundle();
+	            String setup = "(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2), (H 4 4 2), (V 5 0 3)";
+	            bundle.putString("setup", setup);
+	            intent.putExtras(bundle);
+	            startActivity(intent);
             }
         });
 
