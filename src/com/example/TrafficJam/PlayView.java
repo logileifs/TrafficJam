@@ -53,16 +53,16 @@ public class PlayView extends View {
         m_cellHeight = getMeasuredHeight();
         m_cellWidth = getMeasuredWidth();
         //(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2), (H 4 4 2), (V 5 0 3)
-        setBoard("HH...VV..V.vVHHv.V...V..V...HHVHhH..");
+        setBoard("HH...VV..V.vvHHv.VV..V..V...HHV.HhH.");
         mPaint.setColor( Color.WHITE );
         mPaint.setStyle( Paint.Style.STROKE );
     }
 
     public void setBoard( String string )
     {
-        for ( int idx=0, r=5; r>=0; --r ) {
-            for ( int c=0; c<6; ++c, ++idx ) {
-                m_board[c][r] = string.charAt( idx );
+        for ( int idx=0, i=0 ; i < 6 ;i++ ) {
+            for (int c = 0; c < 6 ; c++, idx++) {
+                m_board[c] [i] = string.charAt( idx );
             }
         }
         invalidate();
@@ -98,22 +98,34 @@ public class PlayView extends View {
             mPaint.setColor( shape.color );
             canvas.drawRect( shape.rect, mPaint );
         }
-
-        for ( int r=5; r>=0; --r ) {
-            for ( int c=0; c<6; ++c ) {
-                mRect.set( c * m_cellWidth, r * m_cellHeight,
-                        c * m_cellWidth + m_cellWidth, r * m_cellHeight + m_cellHeight );
+        for (int i=0 ; i < 6 ;i++ ) {
+            for (int c = 0; c < 6 ; c++) {
+                mRect.set( c * m_cellWidth, i * m_cellHeight,
+                        c * m_cellWidth + m_cellWidth, i * m_cellHeight + m_cellHeight );
                 canvas.drawRect( mRect, mPaint );
                 //mRect.inset( (int)(mRect.width() * 0.1), (int)(mRect.height() * 0.1) );
                 m_shape.setBounds( mRect );
 
-                switch ( m_board[c][r] ) {
-                    case 'x':
-                        m_shape.getPaint().setColor( Color.RED );
+
+                switch ( m_board[c][i] ) {
+                    case 'H':
+                        m_shape.getPaint().setColor( Color.GREEN );
+                        //mRect.inset( (int)(mRect.width() * 0.1), (int)(mRect.height() * 0.1) );
                         m_shape.draw(canvas);
                         break;
-                    case 'o':
+                    case 'V':
                         m_shape.getPaint().setColor( Color.BLUE );
+                        //mRect.inset( (int)(mRect.width() * 0.1), (int)(mRect.height() * 0.1) );
+                        m_shape.draw(canvas);
+                        break;
+                    case 'v':
+                        m_shape.getPaint().setColor( Color.BLUE );
+                        //mRect.inset( (int)(mRect.width() * 0.1), (int)(mRect.height() * 0.1) );
+                        m_shape.draw(canvas);
+                        break;
+                    case 'h':
+                        m_shape.getPaint().setColor( Color.GREEN );
+                        //mRect.inset( (int)(mRect.width() * 0.1), (int)(mRect.height() * 0.1) );
                         m_shape.draw(canvas);
                         break;
                     default:
@@ -131,7 +143,11 @@ public class PlayView extends View {
 
         switch ( event.getAction() ) {
             case MotionEvent.ACTION_DOWN:
-                mMovingShape = findShape( x, y );
+
+                if( m_board [xToCol(x)][yToRow(y)] != '.'){
+
+                }
+
                 break;
             case MotionEvent.ACTION_UP:
                 if ( mMovingShape != null ) {
@@ -141,9 +157,6 @@ public class PlayView extends View {
                 break;
             case MotionEvent.ACTION_MOVE:
             if ( mMovingShape != null ) {
-
-
-
                 if(mMovingShape.isVertical){
                     x = Math.min( x, getWidth() - mMovingShape.rect.width() );
                     y = mMovingShape.rect.top;
@@ -154,13 +167,20 @@ public class PlayView extends View {
                     mMovingShape.rect.offsetTo( x, y );
                     invalidate();
                 }
-
               }
-
                 break;
         }
         return true;
     }
+
+    private int xToCol( int x ) {
+        return x / m_cellWidth;
+    }
+
+    private int yToRow( int y ) {
+        return y / m_cellHeight;
+    }
+
 
     private MyShape findShape( int x, int y ) {
         for ( MyShape shape : mShapes ) {
@@ -168,6 +188,9 @@ public class PlayView extends View {
                 return shape;
             }
         }
+
+
+
         return null;
     }
 
