@@ -51,6 +51,7 @@ public class PlayView extends View {
 
     public PlayView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
         PlayView pl = (PlayView) findViewById(R.id.play_view);
         m_cellHeight = getMeasuredHeight();
         m_cellWidth = getMeasuredWidth();
@@ -72,16 +73,10 @@ public class PlayView extends View {
     }
 
     public void setCars(List<Car> Cars){
-         //int x, int y, int length, char alignment
-        mCars.add(new Car(1,2,2,'H'));
-        mCars.add(new Car(0,1,3,'V'));
-        mCars.add(new Car(0,0,2,'H'));
-        mCars.add(new Car(3,1,3,'V'));
-        mCars.add(new Car(2,5,3,'H'));
-        mCars.add(new Car(0,4,2,'V'));
-        mCars.add(new Car(4,4,2,'H'));
-        mCars.add(new Car(5,0,3,'V'));
+        m_cellHeight = getMeasuredHeight();
+        m_cellWidth = getMeasuredWidth();
         mCars = Cars;
+
     }
 
     @Override
@@ -95,59 +90,24 @@ public class PlayView extends View {
     protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
         m_cellWidth = xNew / 6;
         m_cellHeight = yNew / 6;
-    }
+        for(Car car : mCars){
 
-
-    private void addShapes(Canvas canvas){
-        //m_unitWidth = canvas.getWidth()/6;
-      //  m_unitHeight = canvas.getHeight()/6;
-      //  mShapes.add(new MyShape(new Rect(0, 0,   m_unitWidth, m_unitHeight ), Color.BLACK, true));
-       // mShapes.add(new MyShape(new Rect(0, m_unitHeight*2, m_unitWidth, m_unitHeight*3), Color.GREEN, false));
+          if(!car.isVertical()){
+            mShapes.add(new MyShape(new Rect(car.x * m_cellWidth, car.y * m_cellHeight,
+                    (car.x+car.length) * m_cellWidth + m_cellWidth, car.y * m_cellHeight + m_cellHeight),  Color.GREEN, car.isVertical()));
+          }else{
+            mShapes.add(new MyShape(new Rect(car.x * m_cellWidth, car.y * m_cellHeight,
+                    car.x * m_cellWidth + m_cellWidth, (car.y+car.length) * m_cellHeight + m_cellHeight),  Color.BLUE, car.isVertical()));
+          }
+        }
     }
 
     protected void onDraw(Canvas canvas){
-        if(mShapes.isEmpty()){
-            addShapes(canvas);
-        }
+
 
         for ( MyShape shape : mShapes ) {
             movingPaint.setColor( shape.color );
             canvas.drawRect( shape.rect, movingPaint );
-        }
-        for (int i=0 ; i < 6 ;i++ ) {
-            for (int c = 0; c < 6 ; c++) {
-                mRect.set( c * m_cellWidth, i * m_cellHeight,
-                        c * m_cellWidth + m_cellWidth, i * m_cellHeight + m_cellHeight );
-                canvas.drawRect( mRect, mPaint );
-                //mRect.inset( (int)(mRect.width() * 0.1), (int)(mRect.height() * 0.1) );
-                m_shape.setBounds( mRect );
-
-
-                switch ( m_board[c][i] ) {
-                    case 'H':
-                        m_shape.getPaint().setColor( Color.GREEN );
-                        //mRect.inset( (int)(mRect.width() * 0.1), (int)(mRect.height() * 0.1) );
-                        m_shape.draw(canvas);
-                        break;
-                    case 'V':
-                        m_shape.getPaint().setColor( Color.BLUE );
-                        //mRect.inset( (int)(mRect.width() * 0.1), (int)(mRect.height() * 0.1) );
-                        m_shape.draw(canvas);
-                        break;
-                    case 'v':
-                        m_shape.getPaint().setColor( Color.BLUE );
-                        //mRect.inset( (int)(mRect.width() * 0.1), (int)(mRect.height() * 0.1) );
-                        m_shape.draw(canvas);
-                        break;
-                    case 'h':
-                        m_shape.getPaint().setColor( Color.GREEN );
-                        //mRect.inset( (int)(mRect.width() * 0.1), (int)(mRect.height() * 0.1) );
-                        m_shape.draw(canvas);
-                        break;
-                    default:
-                        break;
-                }
-            }
         }
 
     }
@@ -159,35 +119,16 @@ public class PlayView extends View {
 
         switch ( event.getAction() ) {
             case MotionEvent.ACTION_DOWN:
-
-
-                if( m_board [xToCol(x)][yToRow(y)] != '.'){
-
-                    if(m_board [xToCol(x)][yToRow(y)] == 'v' | m_board [xToCol(x)][yToRow(y)] == 'V' ){
-                        mMovingShape =  new MyShape(new Rect( xToCol(x) * m_cellWidth, yToRow(y) * m_cellHeight,
-                                xToCol(x) * m_cellWidth + m_cellWidth, yToRow(y) * m_cellHeight + m_cellHeight ), Color.BLACK, false);
-                    }
-
-                    if(m_board [xToCol(x)][yToRow(y)] == 'h' | m_board [xToCol(x)][yToRow(y)] == 'H' ){
-                        mMovingShape =  new MyShape(new Rect( xToCol(x) * m_cellWidth, yToRow(y) * m_cellHeight,
-                                xToCol(x) * m_cellWidth + m_cellWidth, yToRow(y) * m_cellHeight + m_cellHeight ), Color.BLACK, true);
-                    }
-
-                    m_board [xToCol(x)][yToRow(y)] = '.';
-                    mShapes.add(mMovingShape);
-                }
-
+                mMovingShape = findShape( x, y );
                 break;
             case MotionEvent.ACTION_UP:
                 if ( mMovingShape != null ) {
-                    m_board [xToCol(x)][yToRow(y)] = 'v';
                     mMovingShape = null;
-                    mShapes.clear();
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
             if ( mMovingShape != null ) {
-                if(mMovingShape.isVertical){
+                if(!        mMovingShape.isVertical){
                     x = Math.min( x, getWidth() - mMovingShape.rect.width() );
                     y = mMovingShape.rect.top;
                     mMovingShape.rect.offsetTo( x, y );
