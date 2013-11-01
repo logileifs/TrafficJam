@@ -94,10 +94,10 @@ public class PlayView extends View {
 
           if(!car.isVertical()){
             mShapes.add(new MyShape(new Rect(car.x * m_cellWidth, car.y * m_cellHeight,
-                    (car.x+car.length) * m_cellWidth + m_cellWidth, car.y * m_cellHeight + m_cellHeight),  Color.GREEN, car.isVertical()));
+                    (car.x+car.length-1) * m_cellWidth + m_cellWidth, car.y * m_cellHeight + m_cellHeight),  Color.GREEN, car.isVertical()));
           }else{
             mShapes.add(new MyShape(new Rect(car.x * m_cellWidth, car.y * m_cellHeight,
-                    car.x * m_cellWidth + m_cellWidth, (car.y+car.length) * m_cellHeight + m_cellHeight),  Color.BLUE, car.isVertical()));
+                    car.x * m_cellWidth + m_cellWidth, (car.y+car.length-1) * m_cellHeight + m_cellHeight),  Color.BLUE, car.isVertical()));
           }
         }
     }
