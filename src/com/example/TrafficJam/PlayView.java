@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,7 +41,9 @@ public class PlayView extends View {
     }
 
     private char[][] m_board = new char[6][6];
+    List<Car> mCars;
     Paint mPaint = new Paint();
+    Paint movingPaint = new Paint();
     ArrayList<MyShape> mShapes = new ArrayList<MyShape>();
     MyShape mMovingShape = null;
     Rect mRect = new Rect();
@@ -49,7 +52,6 @@ public class PlayView extends View {
     public PlayView(Context context, AttributeSet attrs) {
         super(context, attrs);
         PlayView pl = (PlayView) findViewById(R.id.play_view);
-
         m_cellHeight = getMeasuredHeight();
         m_cellWidth = getMeasuredWidth();
         //(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2), (H 4 4 2), (V 5 0 3)
@@ -63,9 +65,23 @@ public class PlayView extends View {
         for ( int idx=0, i=0 ; i < 6 ;i++ ) {
             for (int c = 0; c < 6 ; c++, idx++) {
                 m_board[c] [i] = string.charAt( idx );
+
             }
         }
         invalidate();
+    }
+
+    public void setCars(List<Car> Cars){
+         //int x, int y, int length, char alignment
+        mCars.add(new Car(1,2,2,'H'));
+        mCars.add(new Car(0,1,3,'V'));
+        mCars.add(new Car(0,0,2,'H'));
+        mCars.add(new Car(3,1,3,'V'));
+        mCars.add(new Car(2,5,3,'H'));
+        mCars.add(new Car(0,4,2,'V'));
+        mCars.add(new Car(4,4,2,'H'));
+        mCars.add(new Car(5,0,3,'V'));
+        mCars = Cars;
     }
 
     @Override
@@ -95,8 +111,8 @@ public class PlayView extends View {
         }
 
         for ( MyShape shape : mShapes ) {
-            mPaint.setColor( shape.color );
-            canvas.drawRect( shape.rect, mPaint );
+            movingPaint.setColor( shape.color );
+            canvas.drawRect( shape.rect, movingPaint );
         }
         for (int i=0 ; i < 6 ;i++ ) {
             for (int c = 0; c < 6 ; c++) {
@@ -144,15 +160,29 @@ public class PlayView extends View {
         switch ( event.getAction() ) {
             case MotionEvent.ACTION_DOWN:
 
+
                 if( m_board [xToCol(x)][yToRow(y)] != '.'){
 
+                    if(m_board [xToCol(x)][yToRow(y)] == 'v' | m_board [xToCol(x)][yToRow(y)] == 'V' ){
+                        mMovingShape =  new MyShape(new Rect( xToCol(x) * m_cellWidth, yToRow(y) * m_cellHeight,
+                                xToCol(x) * m_cellWidth + m_cellWidth, yToRow(y) * m_cellHeight + m_cellHeight ), Color.BLACK, false);
+                    }
+
+                    if(m_board [xToCol(x)][yToRow(y)] == 'h' | m_board [xToCol(x)][yToRow(y)] == 'H' ){
+                        mMovingShape =  new MyShape(new Rect( xToCol(x) * m_cellWidth, yToRow(y) * m_cellHeight,
+                                xToCol(x) * m_cellWidth + m_cellWidth, yToRow(y) * m_cellHeight + m_cellHeight ), Color.BLACK, true);
+                    }
+
+                    m_board [xToCol(x)][yToRow(y)] = '.';
+                    mShapes.add(mMovingShape);
                 }
 
                 break;
             case MotionEvent.ACTION_UP:
                 if ( mMovingShape != null ) {
+                    m_board [xToCol(x)][yToRow(y)] = 'v';
                     mMovingShape = null;
-                    // emit an custom event ....
+                    mShapes.clear();
                 }
                 break;
             case MotionEvent.ACTION_MOVE:

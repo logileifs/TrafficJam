@@ -14,7 +14,7 @@ public class Car
 	public int length;
 	public char alignment;
 
-	public Car()
+    public Car()
 	{
 
 	}
@@ -26,4 +26,13 @@ public class Car
 		this.length = length;
 		this.alignment = alignment;
 	}
+
+    public boolean isVertical() {
+        if(this.alignment == 'V'){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
