@@ -115,22 +115,25 @@ public class PlayView extends View {
             if ( mMovingShape != null ) {
                 if(!mMovingShape.isVertical){
                     if(collision(mMovingShape.rect, true)){
+                        updateCars(mMovingShape.id, x, y);
                         mMovingShape = null;
                         invalidate();
                     }  else {
                         x = Math.min( x, getWidth() - mMovingShape.rect.width() );
                         y = mMovingShape.rect.top;
-                        mMovingShape.rect.offsetTo( x - mMovingShape.rect.width()/2, y );
+                        mMovingShape.rect.offsetTo( x , y);//mMovingShape.rect.width()/2, y );
                         invalidate();
                     }
                     }else{
 
                     if(collision(mMovingShape.rect, false) ){
+                        updateCars(mMovingShape.id, x, y);
                         mMovingShape = null;
                         invalidate();
                     } else{
                         x = mMovingShape.rect.left;
                         mMovingShape.rect.offsetTo( x, y-mMovingShape.rect.height()/2 );
+
                         invalidate();
                     }
                 }
@@ -142,6 +145,8 @@ public class PlayView extends View {
     }
 
     private boolean collision(Rect car, boolean isVertical){
+        int boardWidth = m_cellWidth*6;
+        int boardHeight = m_cellHeight*6;
 
        for(MyShape shape : mShapes){
             if(!shape.rect.equals(car)){
@@ -150,18 +155,39 @@ public class PlayView extends View {
                         if(findShape(car.centerX(),car.top-2) != null){  // er eitthvað fyrir ofan
                             car.offsetTo(car.left,shape.rect.bottom+1);
                         } else {   // down
-                            car.offsetTo(car.left,shape.rect.top-3*m_cellHeight-1);
+                            car.offsetTo(car.left,shape.rect.top-car.height()-1);
                         }
                     } else {
                         if(findShape(car.left-2,car.centerY()) != null){ // er eitthvað til hægrivið kubbinn
                             car.offsetTo(shape.rect.right+1, car.top);
                         } else {   //right
-                            car.offsetTo(shape.rect.left-2*m_cellWidth-1, car.top);
+
+                            car.offsetTo(shape.rect.left-car.width()-1, car.top);
                         }
                     }
 
                     return true;
                 }
+                    if(car.top < 0){ // out of bounds check
+                        //top of board
+                        car.offsetTo(car.left,0);
+                        return true;
+                    }
+                    if(car.left < 0){
+                        //left of board
+                        car.offsetTo(0,car.top);
+                        return true;
+                    }
+                    if(car.right > boardWidth){
+                        //right of board
+                        car.offsetTo(car.right-car.width(),car.top);
+                        return true;
+                    }
+                    if(car.bottom > boardHeight){
+                        //bottom of board
+                        car.offsetTo(car.left, boardHeight-car.height());
+                        return true;
+                    }
                 }
        }
         return false;
@@ -174,10 +200,7 @@ public class PlayView extends View {
                         return shape;
                 }
         }
-<<<<<<< HEAD
 
-=======
->>>>>>> 451a1cdedf854870050877bf5d8969478a2bfaa5
         return null;
     }
 
