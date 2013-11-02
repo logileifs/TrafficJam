@@ -1,11 +1,13 @@
 package com.example.TrafficJam;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Xml;
 import android.widget.Toast;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlSerializer;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -15,7 +17,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -55,7 +57,8 @@ public class PlayActivity extends Activity {
 			System.out.println("car " + car.id + " car x: " + car.x + " car y: " + car.y);
 		}*/
 
-		writeXML();
+		writeXML2();
+//		editCurrentPuzzle();
 		//TODO: write to XML
 	}
 
@@ -119,21 +122,52 @@ public class PlayActivity extends Activity {
 		}
 	}
 
+	public void writeXML2()
+	{
+		final String xmlFile="userData";
+		String userNAme="username";
+		String password="password";
+		try {
+			FileOutputStream fileos= getApplicationContext().openFileOutput(xmlFile, Context.MODE_APPEND);
+			XmlSerializer xmlSerializer = Xml.newSerializer();
+			StringWriter writer = new StringWriter();
+			xmlSerializer.setOutput(writer);
+			xmlSerializer.startDocument("UTF-8",true);
+			xmlSerializer.startTag(null, "userData");
+			xmlSerializer.startTag(null, "userName");
+			xmlSerializer.text(userNAme);
+			xmlSerializer.endTag(null,"userName");
+			xmlSerializer.startTag(null,"password");
+			xmlSerializer.text(password);
+			xmlSerializer.endTag(null, "password");
+			xmlSerializer.endTag(null, "userData");
+			xmlSerializer.endDocument();
+			xmlSerializer.flush();
+			String dataWrite=writer.toString();
+			fileos.write(dataWrite.getBytes());
+			fileos.close();
+		} catch (FileNotFoundException e) {
+// TODO Auto-generated catch block
+			System.out.println("FileNotFoundException");
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+// TODO Auto-generated catch block
+			System.out.println("IllegalArgumentException");
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+// TODO Auto-generated catch block
+			System.out.println("IllegalStateException");
+			e.printStackTrace();
+		} catch (IOException e) {
+// TODO Auto-generated catch block
+			System.out.println("IOException");
+			e.printStackTrace();
+		}
+	}
+
 	public void writeXML()
 	{
 		System.out.println("writeXML function");
-//		String path = getClass().getClassLoader().getResource(".").getPath();
-/*
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		URL url = classLoader.getResource("res/xml/");
-		File file = null;
-		try {
-			file = new File(url.toURI());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-		}
-
-		System.out.println("path: " + file);*/
 
 		try
 		{
@@ -181,10 +215,10 @@ public class PlayActivity extends Activity {
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File("~/GitRepository/TrafficJam/res/xml/file.xml"));
+			//StreamResult result = new StreamResult(new File("~/tmp/file.xml"));
 
 			// Output to console for testing
-			// StreamResult result = new StreamResult(System.out);
+			StreamResult result = new StreamResult(System.out);
 
 			System.out.println("transformer");
 
@@ -195,13 +229,81 @@ public class PlayActivity extends Activity {
 		}
 		catch (ParserConfigurationException pce)
 		{
-			System.out.println("ParserConfiguration Exception");
+			System.out.println("ParserConfiguration Exception " + pce.getMessage());
 			pce.printStackTrace();
 		}
 		catch (TransformerException tfe)
 		{
 			System.out.println("Transformer Exception");
 			tfe.printStackTrace();
+		}
+	}
+
+	public void editCurrentPuzzle()
+	{
+		try {
+			String filepath = "\\tmp\\file.xml";
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			Document doc = docBuilder.parse(filepath);
+
+			// Get the root element
+			Node company = doc.getFirstChild();
+
+			// Get the staff element , it may not working if tag has spaces, or
+			// whatever weird characters in front...it's better to use
+			// getElementsByTagName() to get it directly.
+			// Node staff = company.getFirstChild();
+
+			// Get the staff element by tag name directly
+			Node staff = doc.getElementsByTagName("staff").item(0);
+
+			// update staff attribute
+			NamedNodeMap attr = staff.getAttributes();
+			Node nodeAttr = attr.getNamedItem("id");
+			nodeAttr.setTextContent("2");
+
+			// append a new node to staff
+			Element age = doc.createElement("age");
+			age.appendChild(doc.createTextNode("28"));
+			staff.appendChild(age);
+
+			// loop the staff child node
+			NodeList list = staff.getChildNodes();
+
+			for (int i = 0; i < list.getLength(); i++) {
+
+				Node node = list.item(i);
+
+				// get the salary element, and update the value
+				if ("salary".equals(node.getNodeName())) {
+					node.setTextContent("2000000");
+				}
+
+				//remove firstname
+				if ("firstname".equals(node.getNodeName())) {
+					staff.removeChild(node);
+				}
+
+			}
+
+			// write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(filepath));
+			transformer.transform(source, result);
+
+			System.out.println("Done");
+
+		} catch (ParserConfigurationException pce) {
+			pce.printStackTrace();
+		} catch (TransformerException tfe) {
+			tfe.printStackTrace();
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		} catch (SAXException sae) {
+			sae.printStackTrace();
 		}
 	}
 }
