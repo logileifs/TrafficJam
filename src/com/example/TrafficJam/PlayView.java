@@ -180,7 +180,7 @@ public class PlayView extends View {
                     }
                     if(car.right > boardWidth){
                         //right of board
-                        car.offsetTo(car.right-car.width(),car.top);
+                        car.offsetTo(boardWidth-car.width(),car.top);
                         return true;
                     }
                     if(car.bottom > boardHeight){
