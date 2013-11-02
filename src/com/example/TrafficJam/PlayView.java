@@ -47,6 +47,9 @@ public class PlayView extends View {
     List<Car> mCars;
     Paint mPaint = new Paint();
     Paint movingPaint = new Paint();
+    boolean mWin = false;
+    Context m_context;
+    PlayActivity activity;
     ArrayList<MyShape> mShapes = new ArrayList<MyShape>();
     MyShape mMovingShape = null;
     Rect mRect = new Rect();
@@ -54,6 +57,9 @@ public class PlayView extends View {
 
     public PlayView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        activity = (PlayActivity)context;
+
 
         m_cellHeight = getMeasuredHeight();
         m_cellWidth = getMeasuredWidth();
@@ -81,7 +87,7 @@ public class PlayView extends View {
         for(Car car : mCars){
           if(!car.isVertical()){
             mShapes.add(new MyShape(new Rect(car.x * m_cellWidth, car.y * m_cellHeight,
-		            (car.x+car.length-1) * m_cellWidth + m_cellWidth, car.y * m_cellHeight + m_cellHeight),  Color.GREEN, car.isVertical(), car.id));
+		            (car.x+car.length-1) * m_cellWidth + m_cellWidth, car.y * m_cellHeight + m_cellHeight), car.id==0 ? Color.RED : Color.GREEN, car.isVertical(), car.id));
           }else{
             mShapes.add(new MyShape(new Rect(car.x * m_cellWidth, car.y * m_cellHeight,
                     car.x * m_cellWidth + m_cellWidth, (car.y+car.length-1) * m_cellHeight + m_cellHeight),  Color.BLUE, car.isVertical(), car.id));
@@ -114,37 +120,36 @@ public class PlayView extends View {
             case MotionEvent.ACTION_MOVE:
             if ( mMovingShape != null ) {
                 if(!mMovingShape.isVertical){
-                    if(collision(mMovingShape.rect, true)){
+                    if(collision(mMovingShape.rect, true, mMovingShape.id)){
                         updateCars(mMovingShape.id, x, y);
                         mMovingShape = null;
                         invalidate();
                     }  else {
-                        x = Math.min( x, getWidth() - mMovingShape.rect.width() );
                         y = mMovingShape.rect.top;
-                        mMovingShape.rect.offsetTo( x , y);//mMovingShape.rect.width()/2, y );
+                        mMovingShape.rect.offsetTo( x - mMovingShape.rect.width()/2, y );
                         invalidate();
                     }
                     }else{
 
-                    if(collision(mMovingShape.rect, false) ){
+                    if(collision(mMovingShape.rect, false, mMovingShape.id) ){
                         updateCars(mMovingShape.id, x, y);
                         mMovingShape = null;
                         invalidate();
                     } else{
                         x = mMovingShape.rect.left;
                         mMovingShape.rect.offsetTo( x, y-mMovingShape.rect.height()/2 );
-
                         invalidate();
                     }
                 }
-              }
+            }
+
 
               break;
         }
         return true;
     }
 
-    private boolean collision(Rect car, boolean isVertical){
+    private boolean collision(Rect car, boolean isVertical, int id){
         int boardWidth = m_cellWidth*6;
         int boardHeight = m_cellHeight*6;
 
@@ -161,7 +166,6 @@ public class PlayView extends View {
                         if(findShape(car.left-2,car.centerY()) != null){ // er eitthvað til hægrivið kubbinn
                             car.offsetTo(shape.rect.right+1, car.top);
                         } else {   //right
-
                             car.offsetTo(shape.rect.left-car.width()-1, car.top);
                         }
                     }
@@ -180,8 +184,17 @@ public class PlayView extends View {
                     }
                     if(car.right > boardWidth){
                         //right of board
-                        car.offsetTo(boardWidth-car.width(),car.top);
-                        return true;
+                        if(id == 0){
+
+                            car.offsetTo(car.left+car.width(),car.top);
+                            mWin = true;
+                            activity.showToast("You win");
+                            return true;
+
+                        } else{
+                            car.offsetTo(boardWidth-car.width(),car.top);
+                            return true;
+                        }
                     }
                     if(car.bottom > boardHeight){
                         //bottom of board

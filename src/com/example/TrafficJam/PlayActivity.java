@@ -2,6 +2,7 @@ package com.example.TrafficJam;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.widget.Toast;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -66,6 +67,14 @@ public class PlayActivity extends Activity {
 		//TODO: write current puzzle setup to XML file
 		System.out.println("On Stop");
 	}
+
+    public void showToast(String message) {
+        if (!isFinishing()) {
+            Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+    }
 
 	public void parseSetup(String setup)
 	{
