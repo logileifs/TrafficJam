@@ -10,6 +10,7 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.graphics.drawable.shapes.RectShape;
 import android.graphics.drawable.shapes.Shape;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -52,31 +53,16 @@ public class PlayView extends View {
     public PlayView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        PlayView pl = (PlayView) findViewById(R.id.play_view);
         m_cellHeight = getMeasuredHeight();
         m_cellWidth = getMeasuredWidth();
-        //(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2), (H 4 4 2), (V 5 0 3)
-        setBoard("HH...VV..V.vvHHv.VV..V..V...HHV.HhH.");
         mPaint.setColor( Color.WHITE );
         mPaint.setStyle( Paint.Style.STROKE );
-    }
-
-    public void setBoard( String string )
-    {
-        for ( int idx=0, i=0 ; i < 6 ;i++ ) {
-            for (int c = 0; c < 6 ; c++, idx++) {
-                m_board[c] [i] = string.charAt( idx );
-
-            }
-        }
-        invalidate();
     }
 
     public void setCars(List<Car> Cars){
         m_cellHeight = getMeasuredHeight();
         m_cellWidth = getMeasuredWidth();
         mCars = Cars;
-
     }
 
     @Override
@@ -91,7 +77,6 @@ public class PlayView extends View {
         m_cellWidth = xNew / 6;
         m_cellHeight = yNew / 6;
         for(Car car : mCars){
-
           if(!car.isVertical()){
             mShapes.add(new MyShape(new Rect(car.x * m_cellWidth, car.y * m_cellHeight,
                     (car.x+car.length-1) * m_cellWidth + m_cellWidth, car.y * m_cellHeight + m_cellHeight),  Color.GREEN, car.isVertical()));
@@ -100,26 +85,23 @@ public class PlayView extends View {
                     car.x * m_cellWidth + m_cellWidth, (car.y+car.length-1) * m_cellHeight + m_cellHeight),  Color.BLUE, car.isVertical()));
           }
         }
+        for ( MyShape shape : mShapes ) {
+            shape.rect.inset( (int)(shape.rect.width() * 0.01), (int)(shape.rect.height() * 0.01) );
+        }
     }
 
     protected void onDraw(Canvas canvas){
-
-
         for ( MyShape shape : mShapes ) {
             movingPaint.setColor( shape.color );
-            canvas.drawRect( shape.rect, movingPaint );
+            canvas.drawRect(shape.rect, movingPaint);
         }
-
     }
-
     public boolean onTouchEvent(MotionEvent event) {
-
         int x = (int) event.getX();
         int y = (int) event.getY();
-
-        switch ( event.getAction() ) {
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                mMovingShape = findShape( x, y );
+                mMovingShape = findShape(x, y);
                 break;
             case MotionEvent.ACTION_UP:
                 if ( mMovingShape != null ) {
@@ -128,40 +110,67 @@ public class PlayView extends View {
                 break;
             case MotionEvent.ACTION_MOVE:
             if ( mMovingShape != null ) {
-                if(!        mMovingShape.isVertical){
-                    x = Math.min( x, getWidth() - mMovingShape.rect.width() );
-                    y = mMovingShape.rect.top;
-                    mMovingShape.rect.offsetTo( x, y );
-                    invalidate();
-                }else{
-                    x = mMovingShape.rect.left;
-                    mMovingShape.rect.offsetTo( x, y );
-                    invalidate();
+                if(!mMovingShape.isVertical){
+                    if(collision(mMovingShape.rect, true)){
+                        mMovingShape = null;
+                        invalidate();
+                    }  else {
+                        x = Math.min( x, getWidth() - mMovingShape.rect.width() );
+                        y = mMovingShape.rect.top;
+                        mMovingShape.rect.offsetTo( x - mMovingShape.rect.width()/2, y );
+                        invalidate();
+                    }
+                    }else{
+
+                    if(collision(mMovingShape.rect, false) ){
+                        mMovingShape = null;
+                        invalidate();
+                    } else{
+                        x = mMovingShape.rect.left;
+                        mMovingShape.rect.offsetTo( x, y-mMovingShape.rect.height()/2 );
+                        invalidate();
+                    }
                 }
               }
-                break;
+
+              break;
         }
         return true;
     }
 
-    private int xToCol( int x ) {
-        return x / m_cellWidth;
-    }
+    private boolean collision(Rect car, boolean isVertical){
 
-    private int yToRow( int y ) {
-        return y / m_cellHeight;
-    }
+       for(MyShape shape : mShapes){
+            if(!shape.rect.equals(car)){
+                if(car.intersects(shape.rect, car)){
+                    if(!isVertical){
+                        if(findShape(car.centerX(),car.top-2) != null){  // er eitthvað fyrir ofan
+                            car.offsetTo(car.left,shape.rect.bottom+1);
+                        } else {   // down
+                            car.offsetTo(car.left,shape.rect.top-3*m_cellHeight-1);
+                        }
+                    } else {
+                        if(findShape(car.left-2,car.centerY()) != null){ // er eitthvað til hægrivið kubbinn
+                            car.offsetTo(shape.rect.right+1, car.top);
+                        } else {   //right
+                            car.offsetTo(shape.rect.left-2*m_cellWidth-1, car.top);
+                        }
+                    }
 
+                    return true;
+                }
+                }
+       }
+        return false;
+    }
 
     private MyShape findShape( int x, int y ) {
+
         for ( MyShape shape : mShapes ) {
             if ( shape.rect.contains( x, y ) ) {
-                return shape;
-            }
+                        return shape;
+                }
         }
-
-
-
         return null;
     }
 
