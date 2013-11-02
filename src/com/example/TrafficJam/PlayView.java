@@ -106,8 +106,8 @@ public class PlayView extends View {
                 mMovingShape = findShape(x, y);
                 break;
             case MotionEvent.ACTION_UP:
-                updateCars(mMovingShape.id, x, y);
 	            if ( mMovingShape != null ) {
+		            updateCars(mMovingShape.id, x, y);
                     mMovingShape = null;
                 }
                 break;
@@ -174,10 +174,6 @@ public class PlayView extends View {
                         return shape;
                 }
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> 451a1cdedf854870050877bf5d8969478a2bfaa5
         return null;
     }
 
