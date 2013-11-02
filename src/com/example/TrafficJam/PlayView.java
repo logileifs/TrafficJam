@@ -30,14 +30,16 @@ public class PlayView extends View {
 
     private class MyShape {
 
-        MyShape( Rect r, int c, boolean v ) {
+        MyShape( Rect r, int c, boolean v, int i ) {
             rect = r;
             color = c;
             isVertical = v;
+	        id = i;
         }
         Rect rect;
         int  color;
         boolean isVertical;
+	    int id;
     }
 
     private char[][] m_board = new char[6][6];
@@ -94,22 +96,19 @@ public class PlayView extends View {
 
           if(!car.isVertical()){
             mShapes.add(new MyShape(new Rect(car.x * m_cellWidth, car.y * m_cellHeight,
-                    (car.x+car.length-1) * m_cellWidth + m_cellWidth, car.y * m_cellHeight + m_cellHeight),  Color.GREEN, car.isVertical()));
+		            (car.x+car.length-1) * m_cellWidth + m_cellWidth, car.y * m_cellHeight + m_cellHeight),  Color.GREEN, car.isVertical(), car.id));
           }else{
             mShapes.add(new MyShape(new Rect(car.x * m_cellWidth, car.y * m_cellHeight,
-                    car.x * m_cellWidth + m_cellWidth, (car.y+car.length-1) * m_cellHeight + m_cellHeight),  Color.BLUE, car.isVertical()));
+                    car.x * m_cellWidth + m_cellWidth, (car.y+car.length-1) * m_cellHeight + m_cellHeight),  Color.BLUE, car.isVertical(), car.id));
           }
         }
     }
 
     protected void onDraw(Canvas canvas){
-
-
         for ( MyShape shape : mShapes ) {
             movingPaint.setColor( shape.color );
             canvas.drawRect( shape.rect, movingPaint );
         }
-
     }
 
     public boolean onTouchEvent(MotionEvent event) {
@@ -122,7 +121,8 @@ public class PlayView extends View {
                 mMovingShape = findShape( x, y );
                 break;
             case MotionEvent.ACTION_UP:
-                if ( mMovingShape != null ) {
+                updateCars(mMovingShape.id, x, y);
+	            if ( mMovingShape != null ) {
                     mMovingShape = null;
                 }
                 break;
@@ -160,9 +160,36 @@ public class PlayView extends View {
             }
         }
 
-
-
         return null;
     }
 
+	private void updateCars(int id, int x, int y)
+	{
+		System.out.println("update cars " + id);
+		if(findCar(id) != null)
+		{
+			System.out.println("found car " + id);
+			findCar(id).x = Math.round(x/m_cellWidth);
+			findCar(id).y = Math.round(y/m_cellHeight);
+			System.out.println("car x: " + x/m_cellWidth + " car y: " + y/m_cellHeight);
+		}
+	}
+
+	private Car findCar(int id)
+	{
+		for(Car car : mCars)
+		{
+			if(car.id == id)
+				return car;
+		}
+
+		System.out.println("findCar returns null");
+
+		return null;
+	}
+
+	public List<Car> getCars()
+	{
+		return mCars;
+	}
 }

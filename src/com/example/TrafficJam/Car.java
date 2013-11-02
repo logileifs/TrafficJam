@@ -13,6 +13,8 @@ public class Car
 	public int y;
 	public int length;
 	public char alignment;
+	public boolean mainCar = false;
+	public int id;
 
     public Car()
 	{

@@ -14,12 +14,22 @@ public class Puzzle
 	public String setup;
 	public String description;
 
+	public Puzzle()
+	{
+
+	}
+
 	public Puzzle(int number, int level, String setup)
 	{
 		this.number = number;
 		this.level = level;
 		this.setup = setup;
 		setDescription(this.number, this.level);
+	}
+
+	public void setNumber(int number)
+	{
+		this.number = number;
 	}
 
 	public void setLevel(int level)

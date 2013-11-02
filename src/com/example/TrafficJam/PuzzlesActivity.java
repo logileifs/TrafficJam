@@ -82,6 +82,14 @@ public class PuzzlesActivity extends Activity {
 		});
     }
 
+	@Override
+	public void onStop()
+	{
+		super.onStop();
+		//TODO: write current puzzle setup to XML file
+		System.out.println("On Stop");
+	}
+
 	private void parseXML(Activity activity) throws XmlPullParserException, IOException
 	{
 		int number = 0;
