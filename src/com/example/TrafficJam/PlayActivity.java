@@ -2,9 +2,12 @@ package com.example.TrafficJam;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Xml;
 import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.w3c.dom.*;
@@ -35,19 +38,61 @@ import java.util.List;
 public class PlayActivity extends Activity {
     PlayView  m_gv;
 	List<Car> cars = new ArrayList<Car>();
+	Button nextButton;
+	String setup;
+	int puzzleNumber;
+
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 
 	    Bundle b = getIntent().getExtras();
-	    String setup = b.getString("setup");
+	    setup = b.getString("setup");
+	    puzzleNumber = b.getInt("puzzleNumber");
 
 	    parseSetup(setup);
 
         setContentView(R.layout.play);
         m_gv = (PlayView) findViewById( R.id.play_view);
 	    m_gv.setCars(cars);
+
+	    nextButton = (Button)findViewById(R.id.next_button);
+	    if(!m_gv.mWin){
+		    nextButton.setVisibility(View.INVISIBLE);
+	    }
+	    else
+	    {
+		    nextButton.setVisibility(View.VISIBLE);
+	    }
+
+	    nextButton.setOnClickListener( new View.OnClickListener() {
+		    @Override
+		    public void onClick(View view) {
+			    System.out.println("NEXT PUZZLE");
+/*
+			    Intent intent = new Intent(MyActivity.this, PlayActivity.class);
+			    Bundle bundle = new Bundle();
+//	            String setup = "(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2), (H 4 4 2), (V 5 0 3)";
+			    bundle.putString("setup", currentPuzzle.setup);
+			    intent.putExtras(bundle);
+			    startActivity(intent);*/
+		    }
+	    });
+
+	    TextView puzzle_title = (TextView) findViewById(R.id.puzzle_title);
+	    puzzle_title.setText("Puzzle " + puzzleNumber);
     }
+
+	public void setButtonVisibility()
+	{
+		if(!m_gv.mWin){
+			nextButton.setVisibility(View.INVISIBLE);
+		}
+		else
+		{
+			nextButton.setVisibility(View.VISIBLE);
+		}
+	}
 
 	@Override
 	public void onPause()
@@ -77,6 +122,7 @@ public class PlayActivity extends Activity {
             Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
+	        //TODO: show buttons
         }
     }
 

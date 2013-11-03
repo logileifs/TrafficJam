@@ -72,10 +72,12 @@ public class PuzzlesActivity extends Activity {
 
 			    // ListView Clicked item value
 			    String setup = puzzles.get(position).setup;
+			    int number = puzzles.get(position).number;
 
 			    Intent intent = new Intent(PuzzlesActivity.this, PlayActivity.class);
 			    Bundle bundle = new Bundle();
 			    bundle.putString("setup", setup);
+			    bundle.putInt("puzzleNumber", number);
 			    intent.putExtras(bundle);
 			    startActivity(intent);
 		    }

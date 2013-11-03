@@ -51,6 +51,8 @@ public class MyActivity extends Activity
 	            Bundle bundle = new Bundle();
 //	            String setup = "(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2), (H 4 4 2), (V 5 0 3)";
 	            bundle.putString("setup", currentPuzzle.setup);
+	            bundle.putInt("puzzleNumber", currentPuzzle.number);
+	            System.out.println("number: " + currentPuzzle.number);
 	            intent.putExtras(bundle);
 	            startActivity(intent);
             }
@@ -112,7 +114,7 @@ public class MyActivity extends Activity
 				if(xpp.getName().equals("puzzle"))
 				{
 					System.out.println("by til nytt puzzle");
-					currentPuzzle = new Puzzle(number, level, setup);
+					currentPuzzle = new Puzzle(number+1, level, setup);
 				}
 					//puzzles.add(new Puzzle(number, level, setup));
 			}

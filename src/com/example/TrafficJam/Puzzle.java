@@ -10,7 +10,7 @@ package com.example.TrafficJam;
 public class Puzzle
 {
 	private int level;
-	private int number;
+	public int number;
 	public String setup;
 	public String description;
 

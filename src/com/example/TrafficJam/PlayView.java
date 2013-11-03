@@ -184,6 +184,7 @@ public class PlayView extends View {
 
                             car.offsetTo(car.left+car.width(),car.top);
                             mWin = true;
+	                        activity.setButtonVisibility();
                             activity.showToast("You win");
                             return true;
 
