@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Xml;
 import android.view.Gravity;
+import android.widget.TextView;
 import android.widget.Toast;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -77,6 +78,11 @@ public class PlayActivity extends Activity {
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
         }
+    }
+
+    public void updateScore(int score){
+        TextView textMoves = (TextView) findViewById(R.id.textMoves);
+        textMoves.setText("Moves : "+score);
     }
 
 	public void parseSetup(String setup)

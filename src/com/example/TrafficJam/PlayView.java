@@ -43,24 +43,19 @@ public class PlayView extends View {
 	    int id;
     }
 
-    private char[][] m_board = new char[6][6];
     List<Car> mCars;
     Paint mPaint = new Paint();
     Paint movingPaint = new Paint();
     boolean mWin = false;
-    Context m_context;
+    int mMoves;
     PlayActivity activity;
     ArrayList<MyShape> mShapes = new ArrayList<MyShape>();
     MyShape mMovingShape = null;
-    Rect mRect = new Rect();
-    ShapeDrawable m_shape = new ShapeDrawable( new RectShape() );
 
     public PlayView(Context context, AttributeSet attrs) {
         super(context, attrs);
-
+        mMoves = 0;
         activity = (PlayActivity)context;
-
-
         m_cellHeight = getMeasuredHeight();
         m_cellWidth = getMeasuredWidth();
         mPaint.setColor( Color.WHITE );
@@ -104,6 +99,7 @@ public class PlayView extends View {
             canvas.drawRect(shape.rect, movingPaint);
         }
     }
+
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int) event.getX();
         int y = (int) event.getY();
@@ -116,6 +112,7 @@ public class PlayView extends View {
 		            updateCars(mMovingShape.id, x, y);
                     mMovingShape = null;
                 }
+                activity.updateScore(++mMoves);
                 break;
             case MotionEvent.ACTION_MOVE:
             if ( mMovingShape != null ) {
@@ -131,7 +128,7 @@ public class PlayView extends View {
                     }
                     }else{
 
-                    if(collision(mMovingShape.rect, false, mMovingShape.id) ){
+                    if(collision(mMovingShape.rect, false, mMovingShape.id)){
                         updateCars(mMovingShape.id, x, y);
                         mMovingShape = null;
                         invalidate();
@@ -142,9 +139,7 @@ public class PlayView extends View {
                     }
                 }
             }
-
-
-              break;
+            break;
         }
         return true;
     }
@@ -157,19 +152,20 @@ public class PlayView extends View {
             if(!shape.rect.equals(car)){
                 if(car.intersects(shape.rect, car)){
                     if(!isVertical){
-                        if(findShape(car.centerX(),car.top-2) != null){  // er eitthvað fyrir ofan
+                        if(findShape(car.centerX()-m_cellWidth/2+1,car.top-2) != null | findShape(car.centerX()+m_cellWidth/2-1,car.top-2) != null){
+                        // er eitthvað fyrir ofan
                             car.offsetTo(car.left,shape.rect.bottom+1);
                         } else {   // down
                             car.offsetTo(car.left,shape.rect.top-car.height()-1);
                         }
                     } else {
-                        if(findShape(car.left-2,car.centerY()) != null){ // er eitthvað til hægrivið kubbinn
+                        if(findShape(car.left-2,car.centerY()-m_cellHeight/2+1) != null | findShape(car.left-2,car.centerY()+m_cellHeight/2-1) != null  ){
+                        // er eitthvað til hægrivið kubbinn
                             car.offsetTo(shape.rect.right+1, car.top);
                         } else {   //right
                             car.offsetTo(shape.rect.left-car.width()-1, car.top);
                         }
                     }
-
                     return true;
                 }
                     if(car.top < 0){ // out of bounds check
@@ -207,13 +203,11 @@ public class PlayView extends View {
     }
 
     private MyShape findShape( int x, int y ) {
-
         for ( MyShape shape : mShapes ) {
             if ( shape.rect.contains( x, y ) ) {
                         return shape;
                 }
         }
-
         return null;
     }
 
