@@ -33,12 +33,17 @@ import java.util.List;
 public class PlayActivity extends Activity {
     PlayView  m_gv;
 	List<Car> cars = new ArrayList<Car>();
+    int puzzleNumber;
+
+    private PuzzleAdapter mPuzzleAdapter =  new PuzzleAdapter( this );
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 
 	    Bundle b = getIntent().getExtras();
 	    String setup = b.getString("setup");
+        puzzleNumber = b.getInt("puzzleNumber");
+
 
 	    parseSetup(setup);
 
@@ -219,4 +224,8 @@ public class PlayActivity extends Activity {
 			tfe.printStackTrace();
 		}
 	}
+
+    public void setPuzzleAsFinished(){
+        mPuzzleAdapter.updatePuzzle(puzzleNumber,true);
+    }
 }

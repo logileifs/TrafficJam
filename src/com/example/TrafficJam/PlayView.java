@@ -185,6 +185,7 @@ public class PlayView extends View {
                             car.offsetTo(car.left+car.width(),car.top);
                             mWin = true;
                             activity.showToast("You win");
+                            activity.setPuzzleAsFinished();
                             return true;
 
                         } else{
