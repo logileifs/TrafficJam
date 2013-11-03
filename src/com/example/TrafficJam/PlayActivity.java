@@ -3,6 +3,9 @@ package com.example.TrafficJam;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.content.res.XmlResourceParser;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Xml;
 import android.view.Gravity;
@@ -12,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -38,9 +43,12 @@ import java.util.List;
 public class PlayActivity extends Activity {
     PlayView  m_gv;
 	List<Car> cars = new ArrayList<Car>();
+	List<Puzzle> puzzles = new ArrayList<Puzzle>();
 	Button nextButton;
 	String setup;
 	int puzzleNumber;
+	private PuzzleAdapter mStudentsAdapter =  new PuzzleAdapter( this );
+	//Cursor cursor = mStudentsAdapter.queryPuzzle();
 
     private PuzzleAdapter mPuzzleAdapter =  new PuzzleAdapter( this );
 
@@ -71,6 +79,33 @@ public class PlayActivity extends Activity {
 		    @Override
 		    public void onClick(View view) {
 			    System.out.println("NEXT PUZZLE");
+
+			    try {
+				    parseXMLList(PlayActivity.this);
+			    } catch (XmlPullParserException e) {
+				    // TODO Auto-generated catch block
+				    System.out.println("XmlPullParserException");
+				    e.printStackTrace();
+			    } catch (IOException e) {
+				    // TODO Auto-generated catch block
+				    System.out.println("IOEXception");
+				    e.printStackTrace();
+			    }
+
+			    Intent intent = new Intent(PlayActivity.this, PlayActivity.class);
+			    Bundle bundle = new Bundle();
+//	            String setup = "(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2), (H 4 4 2), (V 5 0 3)";
+
+			    for( Puzzle puzzle : puzzles){
+				    if( puzzle.number == getLatestPuzzle()){
+					    bundle.putString("setup", puzzle.setup);
+					    bundle.putInt("puzzleNumber", puzzle.number);
+					    break;
+				    }
+			    }
+
+			    intent.putExtras(bundle);
+			    startActivity(intent);
 /*
 			    Intent intent = new Intent(MyActivity.this, PlayActivity.class);
 			    Bundle bundle = new Bundle();
@@ -183,75 +218,74 @@ public class PlayActivity extends Activity {
 		}
 	}
 
-	public void editCurrentPuzzle()
+	private void parseXMLList(Activity activity) throws XmlPullParserException, IOException
 	{
-		try {
-			String filepath = "\\tmp\\file.xml";
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-			Document doc = docBuilder.parse(filepath);
+		int number = 0;
+		int level = 0;
+		String setup = null;
+		boolean blevel = false;
+		boolean bsetup = false;
+		Resources res = activity.getResources();
+		XmlResourceParser xpp = res.getXml(R.xml.challenge_classic40);
+		xpp.next();
+		int eventType = xpp.getEventType();
+		while (eventType != XmlPullParser.END_DOCUMENT)
+		{
+			if(eventType == XmlPullParser.START_TAG)
+			{
+				if(xpp.getName().equals("puzzle"))
+				{
+					number = Integer.parseInt(xpp.getIdAttribute());
+				}
+				if(xpp.getName().equals("level"))
+				{
+					blevel = true;
+				}
+				if(xpp.getName().equals("setup"))
+				{
+					bsetup = true;
+				}
+			}
+			else if(eventType == XmlPullParser.END_TAG)
+			{
+				if(xpp.getName().equals("puzzle"))
+					puzzles.add(new Puzzle(number, level, setup, false));
+			}
+			else if(eventType == XmlPullParser.TEXT)
+			{
+				if(bsetup)
+					setup = xpp.getText();
 
-			// Get the root element
-			Node company = doc.getFirstChild();
-
-			// Get the staff element , it may not working if tag has spaces, or
-			// whatever weird characters in front...it's better to use
-			// getElementsByTagName() to get it directly.
-			// Node staff = company.getFirstChild();
-
-			// Get the staff element by tag name directly
-			Node staff = doc.getElementsByTagName("staff").item(0);
-
-			// update staff attribute
-			NamedNodeMap attr = staff.getAttributes();
-			Node nodeAttr = attr.getNamedItem("id");
-			nodeAttr.setTextContent("2");
-
-			// append a new node to staff
-			Element age = doc.createElement("age");
-			age.appendChild(doc.createTextNode("28"));
-			staff.appendChild(age);
-
-			// loop the staff child node
-			NodeList list = staff.getChildNodes();
-
-			for (int i = 0; i < list.getLength(); i++) {
-
-				Node node = list.item(i);
-
-				// get the salary element, and update the value
-				if ("salary".equals(node.getNodeName())) {
-					node.setTextContent("2000000");
+				if(blevel)
+				{
+					level = Integer.parseInt(xpp.getText());
 				}
 
-				//remove firstname
-				if ("firstname".equals(node.getNodeName())) {
-					staff.removeChild(node);
-				}
-
+				blevel = false;
+				bsetup = false;
 			}
 
-			// write the content into xml file
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File(filepath));
-			transformer.transform(source, result);
-
-			System.out.println("Done");
-
-		} catch (ParserConfigurationException pce) {
-			pce.printStackTrace();
-		} catch (TransformerException tfe) {
-			tfe.printStackTrace();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		} catch (SAXException sae) {
-			sae.printStackTrace();
+			eventType = xpp.next();
 		}
 	}
 
     public void setPuzzleAsFinished(){
         mPuzzleAdapter.updatePuzzle(puzzleNumber,true);
     }
+
+	public int getLatestPuzzle(){
+		Cursor cursor = mStudentsAdapter.queryPuzzle();
+
+		if (cursor.moveToFirst()) {
+
+			while (!cursor.isAfterLast()) {
+
+				if(!(cursor.getInt(cursor.getColumnIndex("isFinished")) > 0)){
+					return cursor.getInt(cursor.getColumnIndex("puzzleNumber"));
+				}
+				cursor.moveToNext();
+			}
+		}
+		return 39;
+	}
 }
