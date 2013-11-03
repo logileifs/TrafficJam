@@ -45,6 +45,7 @@ public class PlayActivity extends Activity {
 	List<Car> cars = new ArrayList<Car>();
 	List<Puzzle> puzzles = new ArrayList<Puzzle>();
 	Button nextButton;
+	Button prevButton;
 	String setup;
 	int puzzleNumber;
 	private PuzzleAdapter mStudentsAdapter =  new PuzzleAdapter( this );
@@ -66,20 +67,60 @@ public class PlayActivity extends Activity {
         m_gv = (PlayView) findViewById( R.id.play_view);
 	    m_gv.setCars(cars);
 
+        prevButton = (Button)findViewById(R.id.previous_button);
+
+        if(puzzleNumber == 1){
+            prevButton.setVisibility(View.INVISIBLE);
+        }
+
+        prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                try {
+                    parseXMLList(PlayActivity.this);
+                } catch (XmlPullParserException e) {
+                    // TODO Auto-generated catch block
+                    System.out.println("XmlPullParserException");
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    System.out.println("IOEXception");
+                    e.printStackTrace();
+                }
+
+
+                Intent intent = new Intent(PlayActivity.this, PlayActivity.class);
+                Bundle bundle = new Bundle();
+
+                for( Puzzle puzzle : puzzles){
+                    if( puzzle.number == puzzleNumber-1){
+                        bundle.putString("setup", puzzle.setup);
+                        bundle.putInt("puzzleNumber", puzzle.number);
+                        break;
+                    }
+                }
+
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
+
 	    nextButton = (Button)findViewById(R.id.next_button);
-	    if(!m_gv.mWin){
-		    nextButton.setVisibility(View.INVISIBLE);
-	    }
-	    else
-	    {
-		    nextButton.setVisibility(View.VISIBLE);
-	    }
+        if(checkIsFinished(puzzleNumber)){
+            nextButton.setVisibility(View.VISIBLE);
+        }
+        else if(m_gv.mWin)
+        {
+            nextButton.setVisibility(View.VISIBLE);
+        }
+        else {
+            nextButton.setVisibility(View.INVISIBLE);
+        }
 
 	    nextButton.setOnClickListener( new View.OnClickListener() {
 		    @Override
 		    public void onClick(View view) {
-			    System.out.println("NEXT PUZZLE");
-
 			    try {
 				    parseXMLList(PlayActivity.this);
 			    } catch (XmlPullParserException e) {
@@ -94,10 +135,9 @@ public class PlayActivity extends Activity {
 
 			    Intent intent = new Intent(PlayActivity.this, PlayActivity.class);
 			    Bundle bundle = new Bundle();
-//	            String setup = "(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2), (H 4 4 2), (V 5 0 3)";
 
 			    for( Puzzle puzzle : puzzles){
-				    if( puzzle.number == getLatestPuzzle()){
+				    if( puzzle.number == puzzleNumber+1){
 					    bundle.putString("setup", puzzle.setup);
 					    bundle.putInt("puzzleNumber", puzzle.number);
 					    break;
@@ -106,13 +146,6 @@ public class PlayActivity extends Activity {
 
 			    intent.putExtras(bundle);
 			    startActivity(intent);
-/*
-			    Intent intent = new Intent(MyActivity.this, PlayActivity.class);
-			    Bundle bundle = new Bundle();
-//	            String setup = "(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2), (H 4 4 2), (V 5 0 3)";
-			    bundle.putString("setup", currentPuzzle.setup);
-			    intent.putExtras(bundle);
-			    startActivity(intent);*/
 		    }
 	    });
 
@@ -120,15 +153,29 @@ public class PlayActivity extends Activity {
 	    puzzle_title.setText("Puzzle " + puzzleNumber);
     }
 
+
+    public boolean checkIsFinished(int number){
+        Cursor cursor = mStudentsAdapter.getPuzzleByPuzzleNumber(number);
+        if(cursor.moveToFirst()){
+            return cursor.getInt(cursor.getColumnIndex("isFinished"))>0;
+        }
+        return true;
+    }
+
 	public void setButtonVisibility()
 	{
-		if(!m_gv.mWin){
-			nextButton.setVisibility(View.INVISIBLE);
+
+        //!m_gv.mWin
+		if(checkIsFinished(puzzleNumber)){
+			nextButton.setVisibility(View.VISIBLE);
 		}
-		else
+		else if(m_gv.mWin)
 		{
 			nextButton.setVisibility(View.VISIBLE);
 		}
+        else {
+            nextButton.setVisibility(View.INVISIBLE);
+        }
 	}
 
 	@Override

@@ -27,6 +27,7 @@ public class PuzzlesActivity extends Activity {
 	ListView listView;
 	String[] values;
 	List<Puzzle> puzzles = new ArrayList<Puzzle>();
+    PuzzleListAdapter mPuzzleListAdapter;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,15 +56,21 @@ public class PuzzlesActivity extends Activity {
 			index++;
 		}
 
-	    // Define a new Adapter
+
+        mPuzzleListAdapter = new PuzzleListAdapter(puzzles, this);
+        //listview.setAdapter(mJobListAdapter);
+
+        // Define a new Adapter
 	    // First parameter - Context
 	    // Second parameter - Layout for the row
 	    // Third parameter - ID of the TextView to which the data is written
-	    // Forth - the Array of data
+	    // Forth - the Array of data                    ,
 	    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, android.R.id.text1, values);
 
+
 	    // Assign adapter to ListView
-	    listView.setAdapter(adapter);
+	    listView.setAdapter(mPuzzleListAdapter);
+
 
 	    // ListView Item Click Listener
 	    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -83,6 +90,8 @@ public class PuzzlesActivity extends Activity {
 		    }
 		});
     }
+
+
 
 	@Override
 	public void onStop()

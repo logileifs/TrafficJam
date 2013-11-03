@@ -47,7 +47,7 @@ public class PuzzleAdapter {
         openToWrite();
         long value = db.insert(DBhelper.TablePuzzles, null, contentValues );
         close();
-        return value;
+            return value;
     }
 
     public long updatePuzzle( int puzzleNumber , boolean isFinished) {
@@ -59,6 +59,13 @@ public class PuzzleAdapter {
         long value = db.update(DBhelper.TablePuzzles, contentValues, cols[1] + "=" + puzzleNumber, null );
         close();
         return value;
+    }
+
+    public Cursor getPuzzleByPuzzleNumber(int puzzleNumber){
+        openToRead();
+        Cursor cursor = db.query( DBhelper.TablePuzzles,
+                DBhelper.TableStudentsCols, "puzzleNumber" + "=" + puzzleNumber, null, null, null, null );
+        return cursor;
     }
 
     public Cursor queryPuzzle() {
