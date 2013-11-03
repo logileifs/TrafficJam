@@ -77,16 +77,20 @@ public class PuzzleListAdapter extends ArrayAdapter<Puzzle> {
         holder.billsNameView.setText(getItem(position).description);
 
         if(isFinished){
-
+            holder.billsNameView.setTextColor(Color.WHITE);
+            holder.infoView.setTextColor(Color.WHITE);
             holder.colorView.setBackgroundColor(Color.GREEN);
             holder.infoView.setText("Completed");
         }
         else {
             if(getLatestPuzzle() == getItem(position).number){
                 holder.colorView.setBackgroundColor(Color.YELLOW);
+
                 holder.infoView.setText("Unresolved");
             }  else {
                 holder.colorView.setBackgroundColor(Color.RED);
+                holder.infoView.setTextColor(Color.DKGRAY);
+                holder.billsNameView.setTextColor(Color.DKGRAY);
                 holder.infoView.setText("Unresolved");
             }
         }
