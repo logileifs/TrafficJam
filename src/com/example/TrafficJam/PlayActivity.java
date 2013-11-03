@@ -42,6 +42,8 @@ public class PlayActivity extends Activity {
 	String setup;
 	int puzzleNumber;
 
+    private PuzzleAdapter mPuzzleAdapter =  new PuzzleAdapter( this );
+
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -104,9 +106,7 @@ public class PlayActivity extends Activity {
 			System.out.println("car " + car.id + " car x: " + car.x + " car y: " + car.y);
 		}*/
 
-		writeXML2();
 //		editCurrentPuzzle();
-		//TODO: write to XML
 	}
 
 	@Override
@@ -183,123 +183,6 @@ public class PlayActivity extends Activity {
 		}
 	}
 
-	public void writeXML2()
-	{
-		final String xmlFile="userData";
-		String userNAme="username";
-		String password="password";
-		try {
-			FileOutputStream fileos= getApplicationContext().openFileOutput(xmlFile, Context.MODE_APPEND);
-			XmlSerializer xmlSerializer = Xml.newSerializer();
-			StringWriter writer = new StringWriter();
-			xmlSerializer.setOutput(writer);
-			xmlSerializer.startDocument("UTF-8",true);
-			xmlSerializer.startTag(null, "userData");
-			xmlSerializer.startTag(null, "userName");
-			xmlSerializer.text(userNAme);
-			xmlSerializer.endTag(null,"userName");
-			xmlSerializer.startTag(null,"password");
-			xmlSerializer.text(password);
-			xmlSerializer.endTag(null, "password");
-			xmlSerializer.endTag(null, "userData");
-			xmlSerializer.endDocument();
-			xmlSerializer.flush();
-			String dataWrite=writer.toString();
-			fileos.write(dataWrite.getBytes());
-			fileos.close();
-		} catch (FileNotFoundException e) {
-// TODO Auto-generated catch block
-			System.out.println("FileNotFoundException");
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-// TODO Auto-generated catch block
-			System.out.println("IllegalArgumentException");
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-// TODO Auto-generated catch block
-			System.out.println("IllegalStateException");
-			e.printStackTrace();
-		} catch (IOException e) {
-// TODO Auto-generated catch block
-			System.out.println("IOException");
-			e.printStackTrace();
-		}
-	}
-
-	public void writeXML()
-	{
-		System.out.println("writeXML function");
-
-		try
-		{
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-			// root elements
-			Document doc = docBuilder.newDocument();
-			Element rootElement = doc.createElement("company");
-			doc.appendChild(rootElement);
-
-			// staff elements
-			Element staff = doc.createElement("Staff");
-			rootElement.appendChild(staff);
-
-			// set attribute to staff element
-			Attr attr = doc.createAttribute("id");
-			attr.setValue("1");
-			staff.setAttributeNode(attr);
-
-			// shorten way
-			// staff.setAttribute("id", "1");
-
-			// firstname elements
-			Element firstname = doc.createElement("firstname");
-			firstname.appendChild(doc.createTextNode("yong"));
-			staff.appendChild(firstname);
-
-			// lastname elements
-			Element lastname = doc.createElement("lastname");
-			lastname.appendChild(doc.createTextNode("mook kim"));
-			staff.appendChild(lastname);
-
-			// nickname elements
-			Element nickname = doc.createElement("nickname");
-			nickname.appendChild(doc.createTextNode("mkyong"));
-			staff.appendChild(nickname);
-
-			// salary elements
-			Element salary = doc.createElement("salary");
-			salary.appendChild(doc.createTextNode("100000"));
-			staff.appendChild(salary);
-
-			// write the content into xml file
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			Transformer transformer = transformerFactory.newTransformer();
-			DOMSource source = new DOMSource(doc);
-			//StreamResult result = new StreamResult(new File("~/tmp/file.xml"));
-
-			// Output to console for testing
-			StreamResult result = new StreamResult(System.out);
-
-			System.out.println("transformer");
-
-			transformer.transform(source, result);
-
-			System.out.println("File saved!");
-
-		}
-		catch (ParserConfigurationException pce)
-		{
-			System.out.println("ParserConfiguration Exception " + pce.getMessage());
-			pce.printStackTrace();
-		}
-		catch (TransformerException tfe)
-		{
-			System.out.println("Transformer Exception");
-			tfe.printStackTrace();
-		}
-	}
-
 	public void editCurrentPuzzle()
 	{
 		try {
@@ -367,4 +250,8 @@ public class PlayActivity extends Activity {
 			sae.printStackTrace();
 		}
 	}
+
+    public void setPuzzleAsFinished(){
+        mPuzzleAdapter.updatePuzzle(puzzleNumber,true);
+    }
 }

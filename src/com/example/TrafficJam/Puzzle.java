@@ -9,21 +9,24 @@ package com.example.TrafficJam;
  */
 public class Puzzle
 {
-	private int level;
+
+	public int level;
 	public int number;
 	public String setup;
 	public String description;
+    public boolean isFinished;
 
 	public Puzzle()
 	{
 
 	}
 
-	public Puzzle(int number, int level, String setup)
+	public Puzzle(int number, int level, String setup, boolean finished)
 	{
 		this.number = number;
 		this.level = level;
 		this.setup = setup;
+        this.isFinished = finished;
 		setDescription(this.number, this.level);
 	}
 

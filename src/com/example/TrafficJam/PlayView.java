@@ -186,6 +186,7 @@ public class PlayView extends View {
                             mWin = true;
 	                        activity.setButtonVisibility();
                             activity.showToast("You win");
+                            activity.setPuzzleAsFinished();
                             return true;
 
                         } else{
