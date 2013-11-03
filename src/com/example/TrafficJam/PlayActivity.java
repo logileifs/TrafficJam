@@ -3,6 +3,7 @@ package com.example.TrafficJam;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.widget.TextView;
 import android.widget.Toast;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -74,6 +75,11 @@ public class PlayActivity extends Activity {
             toast.setGravity(Gravity.CENTER, 0, 0);
             toast.show();
         }
+    }
+
+    public void updateScore(int score){
+        TextView textMoves = (TextView) findViewById(R.id.textMoves);
+        textMoves.setText("Moves : "+score);
     }
 
 	public void parseSetup(String setup)
