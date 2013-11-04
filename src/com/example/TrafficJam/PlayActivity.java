@@ -107,10 +107,10 @@ public class PlayActivity extends Activity {
         });
 
 	    nextButton = (Button)findViewById(R.id.next_button);
-        if(checkIsFinished(puzzleNumber)){
+        if(checkIsFinished(puzzleNumber) && puzzleNumber != 40){
             nextButton.setVisibility(View.VISIBLE);
         }
-        else if(m_gv.mWin)
+        else if(m_gv.mWin && puzzleNumber != 40)
         {
             nextButton.setVisibility(View.VISIBLE);
         }
