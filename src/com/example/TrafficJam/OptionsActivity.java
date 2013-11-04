@@ -2,6 +2,8 @@ package com.example.TrafficJam;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,8 +13,19 @@ import android.os.Bundle;
  * To change this template use File | Settings | File Templates.
  */
 public class OptionsActivity extends Activity {
+	PuzzleAdapter puzzleAdapter = new PuzzleAdapter(this);
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 	    setContentView(R.layout.options);
+
+	    final Button button = (Button) findViewById(R.id.buttonReset);
+	    button.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v) {
+			    System.out.println("on click reset button");
+			    // Perform action on click
+			    puzzleAdapter.clearData();
+		    }
+	    });
     }
 }

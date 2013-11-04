@@ -10,7 +10,7 @@
             android:text="This is the Options activity"
             />
     <Button
-            android:id="@+id/button"
+            android:id="@+id/buttonReset"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Reset progress"
