@@ -19,7 +19,7 @@ public class DBhelper extends SQLiteOpenHelper {
     public static final String TablePuzzles = "puzzles";
     public static final String[] TableStudentsCols = { "_id", "puzzleNumber", "isFinished" };
 
-    private static final String sqlCreateTableCurrentPuzzle =
+    public static final String sqlCreateTableCurrentPuzzle =
             "CREATE TABLE puzzles (" +
                     "_id  INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "puzzleNumber  INTEGER ," +
@@ -27,7 +27,7 @@ public class DBhelper extends SQLiteOpenHelper {
                     ");";
 
 
-    private static final String sqlDropTableCurrentPuzzle =
+    public static final String sqlDropTableCurrentPuzzle =
             "DROP TABLE IF EXISTS puzzle;";
 
     public DBhelper(Context context) {
