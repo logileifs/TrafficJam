@@ -1,6 +1,7 @@
 package com.example.TrafficJam;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,9 @@ public class OptionsActivity extends Activity {
 			    System.out.println("on click reset button");
 			    // Perform action on click
 			    puzzleAdapter.clearData();
+
+			    Intent intent = new Intent(OptionsActivity.this, MyActivity.class);
+			    startActivity(intent);
 		    }
 	    });
     }
