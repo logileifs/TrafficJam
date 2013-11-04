@@ -28,7 +28,7 @@ public class DBhelper extends SQLiteOpenHelper {
 
 
     public static final String sqlDropTableCurrentPuzzle =
-            "DROP TABLE IF EXISTS puzzle;";
+            "DROP TABLE IF EXISTS puzzles";
 
     public DBhelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
