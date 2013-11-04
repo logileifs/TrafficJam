@@ -75,11 +75,11 @@ public class PuzzleAdapter {
         return cursor;
     }
 
-    public Cursor queryStudent( int sid ) {
-        openToRead();
-        String[] cols = DBhelper.TableStudentsCols;
-        Cursor cursor = db.query( DBhelper.TablePuzzles,
-                cols, cols[1] + "=" + sid , null, null, null, null );
-        return cursor;
+    public void clearData(){
+        openToWrite();
+        db.execSQL(DBhelper.sqlDropTableCurrentPuzzle);
+        db.execSQL(DBhelper.sqlCreateTableCurrentPuzzle);
+        close();
     }
+
 }
