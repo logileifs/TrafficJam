@@ -1,9 +1,12 @@
 package com.example.TrafficJam;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,11 +24,21 @@ public class OptionsActivity extends Activity {
 
 	    final Button button = (Button) findViewById(R.id.buttonReset);
 	    button.setOnClickListener(new View.OnClickListener() {
-		    public void onClick(View v) {
-			    System.out.println("on click reset button");
-			    // Perform action on click
-			    puzzleAdapter.clearData();
-		    }
-	    });
+            public void onClick(View v) {
+
+                // Perform action on click
+                puzzleAdapter.clearData();
+                showToast("Progress has been reset.");
+                Intent intent = new Intent(OptionsActivity.this, MyActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+    public void showToast(String message) {
+        if (!isFinishing()) {
+            Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
     }
 }
